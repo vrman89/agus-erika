@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wedding of Erika & Agus</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom Styles -->
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #2a221f;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .gold-text { color: #d4af37; }
+        .gold-bg { background-color: #d4af37; }
+        .gold-border { border-color: #d4af37; }
+        
+        /* Animation Utilities */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInZoom { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+
+        /* Cover page animations */
+        .animate-opening-text-1, .animate-opening-text-2, .animate-opening-text-3, .animate-opening-guest, .animate-opening-button { opacity: 0; }
+        .animate-opening-text-1 { animation: fadeInUp 1s ease-out 0.5s forwards; }
+        .animate-opening-text-2 { animation: fadeInZoom 1.2s ease-out 1.2s forwards; }
+        .animate-opening-text-3 { animation: fadeInUp 1s ease-out 2.0s forwards; }
+        .animate-opening-guest { animation: fadeInUp 1s ease-out 2.5s forwards; }
+        .animate-opening-button { animation: fadeInUp 1s ease-out 3.0s forwards; }
+
+        /* Main content transition */
+        .content-reveal {
+             opacity: 0;
+             transform: scale(0.98);
+             transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .content-visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Scroll-triggered animations */
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .is-visible { opacity: 1; transform: translateY(0); }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2c2c2c; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+        
+        .guest-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #d4af37;
+        }
+        
+        /* Bottom Navigation with Active Indicator */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background-color: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px); z-index: 40;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(100%);
+            transition: opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s;
+        }
+        .bottom-nav.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .nav-link.active .nav-icon { color: #d4af37; transform: scale(1.1); }
+        .nav-link.active .nav-text { color: #d4af37; font-weight: 600; }
+        #nav-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            width: 50px;
+            background-color: #d4af37;
+            border-radius: 3px 3px 0 0;
+            transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Cover Page -->
+    <div id="cover-page" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 transition-opacity duration-1000 ease-in-out">
+        <div class="text-center p-8">
+            <p class="text-lg tracking-widest animate-opening-text-1">The Wedding Of</p>
+            <h1 class="font-playfair text-6xl md:text-8xl my-4 gold-text animate-opening-text-2">Erika & Agus</h1>
+            <p class="text-xl font-semibold animate-opening-text-3">20.07.2025</p>
+            <div class="mt-8 animate-opening-guest">
+                <p class="text-gray-400">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p id="guest-name" class="text-lg font-bold">Tamu Undangan</p>
+            </div>
+            <button id="open-invitation-btn" class="mt-8 gold-bg text-gray-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 animate-opening-button">
+                <i class="fas fa-envelope-open mr-2"></i>Buka Undangan
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="content-reveal max-w-4xl mx-auto">
+        
+        <button id="music-control" class="fixed bottom-24 right-5 z-40 w-12 h-12 bg-gray-800/50 backdrop-blur-sm text-white rounded-full flex items-center justify-center shadow-lg">
+            <i id="music-icon" class="fas fa-play"></i>
+        </button>
+
+        <header id="home" class="h-screen bg-cover bg-center bg-fixed flex items-center justify-center text-center p-4" style="background-image: url('https://i.ibb.co/6P6Xg1g/wedding-hands-bg.jpg');">
+             <div class="absolute inset-0 bg-black/60"></div>
+            <div class="relative bg-black bg-opacity-50 p-8 rounded-lg animate-on-scroll">
+                <h1 class="font-playfair text-5xl md:text-7xl gold-text">Erika & Agus</h1>
+                <p class="mt-4 text-lg">Dengan Rahmat Tuhan Yang Maha Esa, kami bermaksud mengundang Anda untuk merayakan hari pernikahan kami.</p>
+                <div id="countdown" class="text-2xl mt-8 flex justify-center space-x-4 md:space-x-8">
+                    <div><span id="days" class="font-bold text-4xl gold-text">00</span><br>Hari</div>
+                    <div><span id="hours" class="font-bold text-4xl gold-text">00</span><br>Jam</div>
+                    <div><span id="minutes" class="font-bold text-4xl gold-text">00</span><br>Menit</div>
+                    <div><span id="seconds" class="font-bold text-4xl gold-text">00</span><br>Detik</div>
+                </div>
+            </div>
+        </header>
+
+        <section id="pasangan" class="py-20 px-6 bg-gray-800/30">
+            <div class="text-center mb-12 animate-on-scroll">
+                <h2 class="font-playfair text-4xl gold-text">Pasangan Berbahagia</h2>
+                <p class="mt-2 text-gray-400">Dengan memohon rahmat dan ridho-Nya, kami menyatukan cinta dalam ikatan suci pernikahan.</p>
+            </div>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-12">
+                <div class="text-center w-full md:w-1/2 animate-on-scroll" style="transition-delay: 0.2s;">
+                    <img src="https://placehold.co/300x300/333333/d4af37?text=Agus" alt="Agus Setiawan" class="w-48 h-48 mx-auto rounded-full object-cover border-4 gold-border shadow-lg">
+                    <h3 class="font-playfair text-3xl gold-text mt-6">Agus Setiawan, S.T.</h3>
+                    <p class="mt-2">Putra dari:</p>
+                    <p class="font-semibold">Bpk. Karsidi & Ibu Sumini</p>
+                </div>
+                <div class="text-center w-full md:w-1/2 animate-on-scroll" style="transition-delay: 0.4s;">
+                    <img src="https://placehold.co/300x300/333333/d4af37?text=Erika" alt="Erika Novia Hapsari" class="w-48 h-48 mx-auto rounded-full object-cover border-4 gold-border shadow-lg">
+                    <h3 class="font-playfair text-3xl gold-text mt-6">Erika Novia Hapsari, S.Kom</h3>
+                    <p class="mt-2">Putri dari:</p>
+                    <p class="font-semibold">Bpk. Karsimin & Ibu Ismawati</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="acara" class="py-20 px-6">
+            <div class="text-center mb-12 animate-on-scroll">
+                <h2 class="font-playfair text-4xl gold-text">Save The Date</h2>
+                <p class="mt-2 text-gray-400">Catat tanggal dan waktu momen spesial kami.</p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+                <div class="bg-gray-800/50 p-8 rounded-xl text-center w-full md:w-2/5 animate-on-scroll" style="transition-delay: 0.2s;">
+                    <i class="fas fa-gem text-5xl gold-text mb-4"></i>
+                    <h3 class="font-playfair text-3xl mb-4">Akad Nikah</h3>
+                    <p class="text-lg font-semibold">Minggu, 20 Juli 2025</p>
+                    <p>Pukul 09.00 - 10.00 WIB</p>
+                    <hr class="my-4 border-gray-700">
+                    <p class="font-semibold">Lokasi:</p>
+                    <p>Perum Griya Merselina, Blok F2 / 12, Ds. Sukagalih - Jonggol</p>
+                </div>
+                <div class="bg-gray-800/50 p-8 rounded-xl text-center w-full md:w-2/5 animate-on-scroll" style="transition-delay: 0.4s;">
+                    <i class="fas fa-glass-cheers text-5xl gold-text mb-4"></i>
+                    <h3 class="font-playfair text-3xl mb-4">Resepsi</h3>
+                    <p class="text-lg font-semibold">Minggu, 20 Juli 2025</p>
+                    <p>Pukul 11.00 - 16.00 WIB</p>
+                    <hr class="my-4 border-gray-700">
+                    <p class="font-semibold">Lokasi:</p>
+                    <p>Perum Griya Merselina, Blok F2 / 12, Ds. Sukagalih - Jonggol</p>
+                </div>
+            </div>
+            <div class="text-center mt-12 animate-on-scroll" style="transition-delay: 0.6s;">
+                <a href="https://maps.google.com/?q=Perum+Griya+Merselina,Sukagalih,Jonggol" target="_blank" class="gold-bg text-gray-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 inline-block">
+                    <i class="fas fa-map-marker-alt mr-2"></i>Lihat Peta Lokasi
+                </a>
+            </div>
+        </section>
+
+        <section id="rsvp" class="py-20 px-6 bg-gray-800/30">
+             <div class="text-center mb-12 animate-on-scroll">
+                <h2 class="font-playfair text-4xl gold-text">Buku Tamu & Ucapan</h2>
+                <p class="mt-2 text-gray-400">Kehadiran dan doa restu Anda adalah anugerah terindah bagi kami.</p>
+            </div>
+            <div class="max-w-2xl mx-auto animate-on-scroll" style="transition-delay: 0.2s;">
+                <div id="firestore-status" class="text-center mb-4 text-yellow-500">Menyambungkan ke database...</div>
+                <form id="rsvp-form" class="space-y-6 bg-gray-800/50 p-8 rounded-xl">
+                    <div>
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-300">Nama Anda</label>
+                        <input type="text" id="name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5" placeholder="Tulis nama Anda di sini" required>
+                        <p id="name-validation-msg" class="text-red-400 text-sm mt-2 h-4"></p>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-300">Konfirmasi Kehadiran</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <input id="attend" type="radio" value="Hadir" name="attendance" class="w-4 h-4 text-yellow-600 bg-gray-700 border-gray-600 focus:ring-yellow-500">
+                                <label for="attend" class="ml-2 text-sm font-medium text-gray-300">Hadir</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="not-attend" type="radio" value="Tidak Hadir" name="attendance" class="w-4 h-4 text-yellow-600 bg-gray-700 border-gray-600 focus:ring-yellow-500">
+                                <label for="not-attend" class="ml-2 text-sm font-medium text-gray-300">Tidak Hadir</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="message" class="block mb-2 text-sm font-medium text-gray-300">Ucapan & Doa</label>
+                        <textarea id="message" rows="4" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5" placeholder="Tulis ucapan dan doa terbaik Anda untuk kami..." required></textarea>
+                    </div>
+                    <button type="submit" id="submit-rsvp" class="w-full gold-bg text-gray-900 font-bold py-3 px-5 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-300 disabled:opacity-50">
+                        <i class="fas fa-paper-plane mr-2"></i>Kirim Ucapan
+                    </button>
+                </form>
+
+                <div class="mt-12">
+                    <h3 id="guest-count" class="text-xl font-semibold mb-6 text-center">Ucapan (0)</h3>
+                    <div id="guestbook-entries" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-black/20 mt-12 py-8 text-center text-gray-400 text-sm">
+            <div class="max-w-4xl mx-auto px-6 animate-on-scroll">
+                <p class="font-playfair text-2xl gold-text mb-4">Erika & Agus</p>
+                <p class="mb-6">
+                    Atas kehadiran dan doa restu yang telah diberikan, kami ucapkan terima kasih yang sebesar-besarnya.
+                    <br>
+                    Merupakan suatu kehormatan dan kebahagiaan bagi kami.
+                </p>
+                <div class="border-t border-gray-700/50 w-1/4 mx-auto my-6"></div>
+                <p>&copy; 2025 Erika & Agus. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Bottom Navigation Tabs -->
+    <nav id="bottom-nav" class="bottom-nav">
+        <div class="max-w-4xl mx-auto h-20 flex justify-around items-center text-gray-300 relative">
+            <a href="#home" class="nav-link flex-1 flex flex-col items-center justify-center transition-colors">
+                <i class="nav-icon fas fa-home text-xl transition-transform"></i><span class="nav-text text-xs mt-1 transition-colors">Beranda</span>
+            </a>
+            <a href="#pasangan" class="nav-link flex-1 flex flex-col items-center justify-center transition-colors">
+                <i class="nav-icon fas fa-heart text-xl transition-transform"></i><span class="nav-text text-xs mt-1 transition-colors">Pasangan</span>
+            </a>
+            <a href="#acara" class="nav-link flex-1 flex flex-col items-center justify-center transition-colors">
+                <i class="nav-icon fas fa-calendar-check text-xl transition-transform"></i><span class="nav-text text-xs mt-1 transition-colors">Acara</span>
+            </a>
+            <a href="#rsvp" class="nav-link flex-1 flex flex-col items-center justify-center transition-colors">
+                <i class="nav-icon fas fa-book-open text-xl transition-transform"></i><span class="nav-text text-xs mt-1 transition-colors">Buku Tamu</span>
+            </a>
+            <div id="nav-indicator"></div>
+        </div>
+    </nav>
+
+
+    <!-- Firebase and Tone.js Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, Timestamp, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURATION ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wedding-app';
+        let firebaseConfig;
+        try { firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null; } catch (e) { firebaseConfig = null; }
+        
+        let db, auth;
+        let isAuthReady = false, userId = null, rsvpsUnsubscribe = null;
+        let existingNames = new Set();
+
+        const firestoreStatusEl = document.getElementById('firestore-status');
+        const submitRsvpBtn = document.getElementById('submit-rsvp');
+        
+        if (!firebaseConfig) {
+            firestoreStatusEl.textContent = "Konfigurasi database tidak ditemukan.";
+            submitRsvpBtn.disabled = true;
+        } else {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app); auth = getAuth(app); setLogLevel('error');
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) { userId = user.uid; } else {
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
+                            else { await signInAnonymously(auth); }
+                        } catch (error) { console.error("Auth failed:", error); }
+                    }
+                    isAuthReady = true; firestoreStatusEl.textContent = "Berhasil terhubung. Silakan isi buku tamu."; listenToGuestbook();
+                });
+            } catch (error) { console.error("Firebase init error:", error); firestoreStatusEl.textContent = "Gagal inisialisasi database."; submitRsvpBtn.disabled = true; }
+        }
+
+        // --- UI & INTERACTIVITY ---
+        const openBtn = document.getElementById('open-invitation-btn'), coverPage = document.getElementById('cover-page'), mainContent = document.getElementById('main-content'),
+        bottomNav = document.getElementById('bottom-nav'), musicControl = document.getElementById('music-control'), musicIcon = document.getElementById('music-icon');
+        let player, musicLoop, isPlaying = false;
+
+        function setupMusic() {
+            player = new Tone.PolySynth({ volume: -8, maxPolyphony: 8, voice: Tone.FMSynth, options: { harmonicity: 1.2, modulationIndex: 10, envelope: { attack: 0.01, decay: 0.1, sustain: 0.5, release: 1 }, modulationEnvelope: { attack: 0.1, decay: 0.2, sustain: 0.3, release: 0.8 } } }).toDestination();
+            const chords = [ { time: '0:0', notes: ['C4', 'E4', 'G4'], duration: '2n' }, { time: '0:2', notes: ['G3', 'B3', 'D4'], duration: '2n' }, { time: '1:0', notes: ['A3', 'C4', 'E4'], duration: '2n' }, { time: '1:2', notes: ['F3', 'A3', 'C4'], duration: '2n' } ];
+            musicLoop = new Tone.Part((time, value) => { player.triggerAttackRelease(value.notes, value.duration, time); }, chords).start(0);
+            musicLoop.loop = true; musicLoop.loopEnd = '2m';
+        }
+        musicControl.addEventListener('click', () => { if (!isPlaying) { Tone.start(); if (!player) setupMusic(); Tone.Transport.start(); musicIcon.classList.replace('fa-play', 'fa-pause'); isPlaying = true; } else { Tone.Transport.pause(); musicIcon.classList.replace('fa-pause', 'fa-play'); isPlaying = false; } });
+        
+        openBtn.addEventListener('click', () => {
+            coverPage.style.opacity = '0';
+            setTimeout(() => {
+                coverPage.style.display = 'none';
+                mainContent.classList.add('content-visible');
+                bottomNav.classList.add('visible');
+            }, 1000);
+            if(!isPlaying) musicControl.click();
+            setupScrollAnimations();
+            setupNavIndicator();
+        });
+
+        const weddingDate = new Date("July 20, 2025 09:00:00").getTime();
+        const countdownInterval = setInterval(() => { const now = new Date().getTime(); const d = weddingDate - now; const f = (n) => String(n).padStart(2,'0'); document.getElementById('days').innerText = f(Math.floor(d/(1000*60*60*24))); document.getElementById('hours').innerText = f(Math.floor((d%(1000*60*60*24))/(1000*60*60))); document.getElementById('minutes').innerText = f(Math.floor((d%(1000*60*60))/(1000*60))); document.getElementById('seconds').innerText = f(Math.floor((d%(1000*60))/1000)); if(d<0){ clearInterval(countdownInterval); document.getElementById('countdown').innerHTML="Acara telah dimulai!"; } }, 1000);
+        const urlParams = new URLSearchParams(window.location.search); const guest = urlParams.get('to'); if (guest) document.getElementById('guest-name').innerText = guest;
+
+        // --- ANIMATION LOGIC ---
+        function setupScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.15 });
+            animatedElements.forEach(el => observer.observe(el));
+        }
+
+        function setupNavIndicator() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const indicator = document.getElementById('nav-indicator');
+            const sections = document.querySelectorAll('section[id], header[id]');
+
+            function updateIndicator(activeLink) {
+                if (!activeLink) return;
+                const linkRect = activeLink.getBoundingClientRect();
+                const navRect = bottomNav.getBoundingClientRect();
+                indicator.style.left = `${activeLink.offsetLeft + (linkRect.width / 2) - (indicator.offsetWidth / 2)}px`;
+                navLinks.forEach(link => link.classList.remove('active'));
+                activeLink.classList.add('active');
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
+                        updateIndicator(activeLink);
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+            sections.forEach(section => observer.observe(section));
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    setTimeout(() => updateIndicator(e.currentTarget), 10);
+                });
+            });
+
+            // Initial position
+            setTimeout(() => updateIndicator(document.querySelector('.nav-link[href="#home"]')), 100);
+        }
+
+        // --- FIRESTORE LOGIC ---
+        const rsvpForm = document.getElementById('rsvp-form'), guestbookEntries = document.getElementById('guestbook-entries'), guestCountEl = document.getElementById('guest-count'), nameInput = document.getElementById('name'), nameValidationMsg = document.getElementById('name-validation-msg');
+        function lockForm() { nameValidationMsg.textContent = "Anda sudah mengirimkan ucapan. Terima kasih!"; document.getElementById('message').readOnly = true; document.querySelectorAll('input[name="attendance"]').forEach(radio => radio.disabled = true); submitRsvpBtn.disabled = true; submitRsvpBtn.textContent = "Telah Terkirim"; }
+        nameInput.addEventListener('blur', () => { const name = nameInput.value.trim().toLowerCase(); if (name && existingNames.has(name)) { lockForm(); } });
+        function listenToGuestbook() {
+             if (!isAuthReady || !db) { setTimeout(listenToGuestbook, 500); return; }
+             if (rsvpsUnsubscribe) rsvpsUnsubscribe();
+            const q = query(collection(db, `artifacts/${appId}/public/data/rsvps`));
+            rsvpsUnsubscribe = onSnapshot(q, (snapshot) => {
+                guestbookEntries.innerHTML = ''; existingNames.clear();
+                let docs = snapshot.docs.sort((a, b) => b.data().createdAt.toMillis() - a.data().createdAt.toMillis());
+                docs.forEach((doc) => {
+                    const data = doc.data(); existingNames.add(data.name_lowercase);
+                    const entryDiv = document.createElement('div'); entryDiv.className = 'p-4 rounded-lg guest-card';
+                    const badge = data.attendance === 'Hadir' ? `<span class="bg-green-600 text-white text-xs font-medium px-2.5 py-0.5 rounded-full">Hadir</span>` : `<span class="bg-red-600 text-white text-xs font-medium px-2.5 py-0.5 rounded-full">Tidak Hadir</span>`;
+                    const numHtml = data.attendanceNumber ? `<div class="text-right text-xs text-gray-400 mt-1">No. Hadir: <span class="font-bold gold-text">${String(data.attendanceNumber).padStart(3, '0')}</span></div>` : '';
+                    entryDiv.innerHTML = `<div class="flex justify-between items-start"><p class="font-bold text-lg gold-text">${data.name}</p>${badge}</div><p class="text-gray-300 italic mt-1">"${data.message}"</p>${numHtml}`;
+                    guestbookEntries.appendChild(entryDiv);
+                });
+                guestCountEl.textContent = `Ucapan (${docs.length})`;
+            }, (error) => { console.error("Listen error:", error); });
+        }
+        rsvpForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); if (!db) return; const name = nameInput.value.trim(); const nameLower = name.toLowerCase();
+            if (existingNames.has(nameLower)) { lockForm(); return; }
+            const message = document.getElementById('message').value; const attendance = document.querySelector('input[name="attendance"]:checked')?.value;
+            if(!attendance){ alert('Mohon pilih konfirmasi kehadiran.'); return; }
+            submitRsvpBtn.disabled = true; submitRsvpBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+            try {
+                const docData = { name, name_lowercase: nameLower, message, attendance, createdAt: Timestamp.now() };
+                if (attendance === 'Hadir') { const snap = await getDocs(query(collection(db, `artifacts/${appId}/public/data/rsvps`), where("attendance", "==", "Hadir"))); docData.attendanceNumber = snap.size + 1; }
+                await addDoc(collection(db, `artifacts/${appId}/public/data/rsvps`), docData);
+                rsvpForm.reset(); nameValidationMsg.textContent = "";
+            } catch (error) { console.error("Submit error:", error); alert('Gagal mengirim ucapan.');
+            } finally { submitRsvpBtn.disabled = false; submitRsvpBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Kirim Ucapan'; }
+        });
+    </script>
+</body>
+</html>
